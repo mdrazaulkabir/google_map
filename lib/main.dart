@@ -59,10 +59,10 @@ class _HomeScreenState extends State<HomeScreen> {
           Marker(
               markerId: const MarkerId("one marker"),
               position: const LatLng(23.826741729120208, 90.38760308214225),
-              draggable: true,
-              flat: true,
+              draggable: true,  //marker can move
+              flat: true,      //
               infoWindow: InfoWindow(
-                  title: "one office",
+                  title: "River",
                   onTap: () {
                     print('###########this on the infoWindow');
                   }),
@@ -76,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
             draggable: true,
             flat: true,
             infoWindow: InfoWindow(
-              title: "second office",
+              title: "Covid 19 Risk zone",
               onTap: (){
                 print("########### second office");
               }
@@ -94,8 +94,18 @@ class _HomeScreenState extends State<HomeScreen> {
             strokeColor: Colors.red,
             strokeWidth: 4,
             visible: true,
-            consumeTapEvents: false,
-          )
+            consumeTapEvents: true,//in circle touch will be not work
+          ),
+          Circle(
+            circleId: const CircleId("one circle"),
+            center: const LatLng(23.835714458173435, 90.38845293223858),
+            radius: 200,
+            fillColor: Colors.red.shade100,
+            strokeColor: Colors.red,
+            strokeWidth: 4,
+            visible: true,
+            consumeTapEvents: true,//in circle touch will be not work
+          ),
         },
 
         polylines: <Polyline>{
@@ -111,21 +121,6 @@ class _HomeScreenState extends State<HomeScreen> {
             jointType: JointType.round,
             width: 6,
           ),
-          const Polyline(polylineId: PolylineId("Second poliline"),
-            points: [
-              LatLng(23.824356076803937, 90.38865745067596),
-              LatLng(23.825208411621357, 90.38856726139784),
-              LatLng(23.82605337997818, 90.38851831108332),
-              LatLng(23.827511742545667, 90.38878820836544),
-              LatLng(23.82791535797511, 90.38954023271799),
-              LatLng(23.826337692957527, 90.39043106138706),
-              LatLng(23.82407175948245, 90.39038211107254),
-            ],
-            consumeTapEvents: true,
-            color: Colors.green,
-            width: 4,
-            jointType: JointType.round
-          )
         },
 
 
@@ -145,6 +140,23 @@ class _HomeScreenState extends State<HomeScreen> {
             fillColor: Colors.blueGrey,
             strokeWidth: 4,
             strokeColor: Colors.red,
+            consumeTapEvents: true,
+            visible: true
+          ),
+          Polygon(polygonId: PolygonId('second polygone'),
+            points: [
+              LatLng(23.814763473650913, 90.38974843919277),
+              LatLng(23.813896040403318, 90.39519265294075),
+              LatLng(23.816887249679702, 90.39468571543694),
+              LatLng(23.816573163675343, 90.39009176194668),
+              LatLng(23.81633391796678, 90.38922540843487),
+              LatLng(23.817829503132796, 90.38966663181782)
+            ],
+            fillColor: Colors.greenAccent,
+            strokeColor: Colors.red,
+            strokeWidth: 5,
+              consumeTapEvents: true,
+              visible: true
           )
         },
       ),
