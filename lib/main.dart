@@ -200,6 +200,7 @@ class MyLocation extends StatefulWidget {
 
 class _MyLocationState extends State<MyLocation> {
 
+  Position? _currentLocation;
   Future<bool>_checkPermission()async{
     LocationPermission permission= await Geolocator.checkPermission();
     if(permission==LocationPermission.always|| permission==LocationPermission.whileInUse){
@@ -224,9 +225,15 @@ class _MyLocationState extends State<MyLocation> {
     if(await _checkPermission()) {
       Position position = await Geolocator.getCurrentPosition();
       print(position);
+      _currentLocation=position;
     }
     else{
-      print("Deny check permission!");
+      if(await _requestPermission()){
+        _getCurrentLocation();
+      }
+      else{
+        print("Deny check permission!");
+      }
     }
   }
 
@@ -244,9 +251,39 @@ class _MyLocationState extends State<MyLocation> {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text("LatLog=> Latitude:    Langitude:")
+          Center(child: Text("LatLog=>     Latitude: ${_currentLocation?.latitude}   Langitude:${_currentLocation?.longitude}"))
         ],
       ),
+
+
+
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     _getCurrentLocation();
+      //     // ScaffoldMessenger.of(context).showSnackBar(
+      //     //     SnackBar(content: Text("MyLocaiton"),duration: Duration(seconds: 2),));
+      //   },
+      //   child: Icon(
+      //     Icons.my_location,
+      //     color: Colors.blue,
+      //   ),
+      //   backgroundColor: Colors.greenAccent,
+      // ),
+
+      floatingActionButton: Tooltip(
+        message: 'MyLocation',
+        child: FloatingActionButton(
+          onPressed: () {
+            _getCurrentLocation();
+          },
+          child: Icon(
+            Icons.my_location,
+            color: Colors.blue,
+          ),
+          backgroundColor: Colors.greenAccent,
+        ),
+      ),
+
     );
   }
 }
