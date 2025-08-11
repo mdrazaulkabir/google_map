@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 void main(){
   runApp(const MyApp());
 }
@@ -201,6 +200,7 @@ class MyLocation extends StatefulWidget {
 class _MyLocationState extends State<MyLocation> {
 
   Position? _currentLocation;
+  Position? _currentLiveLocationMovement;
   Future<bool>_checkPermission()async{
     LocationPermission permission= await Geolocator.checkPermission();
     if(permission==LocationPermission.always|| permission==LocationPermission.whileInUse){
@@ -221,11 +221,20 @@ class _MyLocationState extends State<MyLocation> {
     }
   }
 
+  Future<bool>_gpsLocationEnabled()async{
+    return await Geolocator.isLocationServiceEnabled();
+  }
   Future<void> _getCurrentLocation() async {
     if(await _checkPermission()) {
+      if(await _gpsLocationEnabled()){
       Position position = await Geolocator.getCurrentPosition();
       print(position);
       _currentLocation=position;
+      setState(() { });
+      }
+      else{
+        Geolocator.openLocationSettings();
+      }
     }
     else{
       if(await _requestPermission()){
@@ -233,6 +242,31 @@ class _MyLocationState extends State<MyLocation> {
       }
       else{
         print("Deny check permission!");
+        Geolocator.openAppSettings();
+      }
+    }
+  }
+
+
+  Future<void> _getCurrentLiveLocation() async {
+    if(await _checkPermission()) {
+      if(await _gpsLocationEnabled()){
+       Geolocator.getPositionStream().listen((location) {
+         _currentLiveLocationMovement=location;
+         setState(() { });
+       });
+      }
+      else{
+        Geolocator.openLocationSettings();
+      }
+    }
+    else{
+      if(await _requestPermission()){
+        _getCurrentLocation();
+      }
+      else{
+        print("Deny check permission!");
+        Geolocator.openAppSettings();
       }
     }
   }
@@ -248,11 +282,15 @@ class _MyLocationState extends State<MyLocation> {
           Icon(Icons.logout)
         ],
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Center(child: Text("LatLog=>     Latitude: ${_currentLocation?.latitude}   Langitude:${_currentLocation?.longitude}"))
-        ],
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("LatLog=>     Latitude: ${_currentLocation?.latitude}   Langitude:${_currentLocation?.longitude}"),
+            Text("${_currentLocation?.isMocked?? ''}"),
+            Text("Live location movement: $_currentLiveLocationMovement")
+          ],
+        ),
       ),
 
 
@@ -270,18 +308,36 @@ class _MyLocationState extends State<MyLocation> {
       //   backgroundColor: Colors.greenAccent,
       // ),
 
-      floatingActionButton: Tooltip(
-        message: 'MyLocation',
-        child: FloatingActionButton(
-          onPressed: () {
-            _getCurrentLocation();
-          },
-          child: Icon(
-            Icons.my_location,
-            color: Colors.blue,
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Tooltip(
+            message: 'MyLocation',
+            child: FloatingActionButton(
+              onPressed: () {
+                _getCurrentLocation();
+              },
+              child: Icon(
+                Icons.my_location,
+                color: Colors.blue,
+              ),
+              backgroundColor: Colors.greenAccent,
+            ),
           ),
-          backgroundColor: Colors.greenAccent,
-        ),
+
+          Tooltip(
+              message: "Live Location Movement",
+              child: FloatingActionButton(
+                backgroundColor: Colors.greenAccent,
+                onPressed: () {
+                  _getCurrentLiveLocation();
+                },
+                child: Icon(
+                  Icons.location_history,
+                  color: Colors.blue,
+                ),
+              )),
+        ],
       ),
 
     );
